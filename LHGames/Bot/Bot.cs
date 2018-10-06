@@ -24,37 +24,37 @@ namespace LHGames.Bot
          PlayerInfo = playerInfo;
       }
 
-      /// <summary>
-      /// Implement your bot here.
-      /// </summary>
-      /// <param name="map">The gamemap.</param>
-      /// <param name="visiblePlayers">Players that are visible to your bot.</param>
-      /// <returns>The action you wish to execute.</returns>
-      internal string ExecuteTurn(Map map, IEnumerable<IPlayer> visiblePlayers)
-      {
-         getInterestingObjects(map, PlayerInfo.Position);
-         objects.Sort((x, y) => x.priority.CompareTo(y.priority));
-         Point nextMove;
-         if (PlayerInfo.Position == PlayerInfo.HouseLocation)
-         {
-            nextMove = new Point();
-            if (PlayerInfo.GetUpgradeLevel(UpgradeType.CarryingCapacity) == 0 && PlayerInfo.TotalResources >= upgrades[0])
+        /// <summary>
+        /// Implement your bot here.
+        /// </summary>
+        /// <param name="map">The gamemap.</param>
+        /// <param name="visiblePlayers">Players that are visible to your bot.</param>
+        /// <returns>The action you wish to execute.</returns>
+        internal string ExecuteTurn(Map map, IEnumerable<IPlayer> visiblePlayers)
+        {
+            getInterestingObjects(map, PlayerInfo.Position);
+            objects.Sort((x, y) => x.priority.CompareTo(y.priority));
+            Point nextMove;
+            if (PlayerInfo.Position == PlayerInfo.HouseLocation)
             {
-               return AIHelper.CreateUpgradeAction(UpgradeType.CarryingCapacity);
+                nextMove = new Point();
+                if (PlayerInfo.GetUpgradeLevel(UpgradeType.CarryingCapacity) == 0 && PlayerInfo.TotalResources >= upgrades[0])
+                {
+                    return AIHelper.CreateUpgradeAction(UpgradeType.CarryingCapacity);
+                }
+                if (PlayerInfo.GetUpgradeLevel(UpgradeType.AttackPower) == 0 && PlayerInfo.TotalResources >= upgrades[0])
+                {
+                    return AIHelper.CreateUpgradeAction(UpgradeType.AttackPower);
+                }
+                if (PlayerInfo.GetUpgradeLevel(UpgradeType.CarryingCapacity) == 1 && PlayerInfo.TotalResources >= upgrades[1])
+                {
+                    return AIHelper.CreateUpgradeAction(UpgradeType.CarryingCapacity);
+                }
+                if (PlayerInfo.GetUpgradeLevel(UpgradeType.CollectingSpeed) == 0 && PlayerInfo.TotalResources >= upgrades[0])
+                {
+                    return AIHelper.CreateUpgradeAction(UpgradeType.CollectingSpeed);
+                }
             }
-            if (PlayerInfo.GetUpgradeLevel(UpgradeType.AttackPower) == 0 && PlayerInfo.TotalResources >= upgrades[0])
-            {
-               return AIHelper.CreateUpgradeAction(UpgradeType.AttackPower);
-            }
-            if (PlayerInfo.GetUpgradeLevel(UpgradeType.CarryingCapacity) == 1 && PlayerInfo.TotalResources >= upgrades[1])
-            {
-               return AIHelper.CreateUpgradeAction(UpgradeType.CarryingCapacity);
-            }
-            if (PlayerInfo.GetUpgradeLevel(UpgradeType.AttackPower) == 1 && PlayerInfo.TotalResources >= upgrades[1])
-            {
-               return AIHelper.CreateUpgradeAction(UpgradeType.AttackPower);
-            }
-         }
 
          if (PlayerInfo.CarriedResources == PlayerInfo.CarryingCapacity)
          {
