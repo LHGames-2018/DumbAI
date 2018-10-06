@@ -1,55 +1,86 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using LHGames.Helper;
 
 namespace LHGames.Bot
 {
-    internal class Bot
-    {
-        internal IPlayer PlayerInfo { get; set; }
-        private int _currentDirection = 1;
+   internal class Bot
+   {
+      internal IPlayer PlayerInfo { get; set; }
+      private int _currentDirection = 1;
+      List<InterestingObject> objects = new List<InterestingObject>();
+      //InterestingObject currentObject = null;
 
-        internal Bot() { }
+      internal Bot() { }
 
-        /// <summary>
-        /// Gets called before ExecuteTurn. This is where you get your bot's state.
-        /// </summary>
-        /// <param name="playerInfo">Your bot's current state.</param>
-        internal void BeforeTurn(IPlayer playerInfo)
-        {
-            PlayerInfo = playerInfo;
-        }
+      /// <summary>
+      /// Gets called before ExecuteTurn. This is where you get your bot's state.
+      /// </summary>
+      /// <param name="playerInfo">Your bot's current state.</param>
+      internal void BeforeTurn(IPlayer playerInfo)
+      {
+         PlayerInfo = playerInfo;
+      }
 
-        /// <summary>
-        /// Implement your bot here.
-        /// </summary>
-        /// <param name="map">The gamemap.</param>
-        /// <param name="visiblePlayers">Players that are visible to your bot.</param>
-        /// <returns>The action you wish to execute.</returns>
-        internal string ExecuteTurn(Map map, IEnumerable<IPlayer> visiblePlayers)
-        {
-            // TODO: Implement your AI here.
-            if (map.GetTileAt(PlayerInfo.Position.X + _currentDirection, PlayerInfo.Position.Y) == TileContent.Wall)
+      /// <summary>
+      /// Implement your bot here.
+      /// </summary>
+      /// <param name="map">The gamemap.</param>
+      /// <param name="visiblePlayers">Players that are visible to your bot.</param>
+      /// <returns>The action you wish to execute.</returns>
+      internal string ExecuteTurn(Map map, IEnumerable<IPlayer> visiblePlayers)
+      {
+         getInterestingObjects(map, PlayerInfo.Position);
+         objects.Sort((x , y) => x.priority.CompareTo(y.priority));
+
+         PathFinder pathfinder = new PathFinder(map, PlayerInfo.Position, objects[0].position);
+
+         return AIHelper.CreateMoveAction(pathfinder.FindNextMove());
+      }
+
+      /// <summary>
+      /// Gets called after ExecuteTurn.
+      /// </summary>
+      internal void AfterTurn()
+      {
+      }
+
+      internal void getInterestingObjects(Map map, Point ownPosition)
+      {
+         List<Tile> visibleTiles = new List<Tile>(map.GetVisibleTiles());
+         for (int i = 0; i < visibleTiles.Count; i++)
+         {
+            Tile currentTile = visibleTiles[i];
+            InterestingObject currentObject = null;
+            switch ((int)currentTile.TileType)
             {
-                _currentDirection *= -1;
-            }
-            var data = StorageHelper.Read<TestClass>("Test");
-            Console.WriteLine(data?.Test);
-            return AIHelper.CreateMoveAction(new Point(_currentDirection, 0));
-        }
+               case 4:
+                  currentObject = new InterestingObject() { distanceFromUser = new int[2] { currentTile.Position.X - PlayerInfo.Position.X, currentTile.Position.Y - PlayerInfo.Position.Y }, type = currentTile.TileType, position = currentTile.Position};
+                  currentObject.priority = Math.Abs(currentObject.distanceFromUser[0]) + Math.Abs(currentObject.distanceFromUser[1]);
+                  break;
 
-        /// <summary>
-        /// Gets called after ExecuteTurn.
-        /// </summary>
-        internal void AfterTurn()
-        {
-        }
-    }
+               case 6:
+                  currentObject = new InterestingObject() { distanceFromUser = new int[2] { currentTile.Position.X - PlayerInfo.Position.X, currentTile.Position.Y - PlayerInfo.Position.Y }, type = currentTile.TileType, position = currentTile.Position};
+                  currentObject.priority = Math.Abs(currentObject.distanceFromUser[0]) + Math.Abs(currentObject.distanceFromUser[1]) - 5; //+5 to make the enemies always prioritary over resources
+                  break;
+
+               default:
+                  break;
+
+            }
+            if(currentObject != null && currentObject.position != ownPosition)
+               objects.Add(currentObject);
+         }
+      }
+   }
 }
+
+
 
 class TestClass
 {
-    public string Test { get; set; }
+   public string Test { get; set; }
 }
 
 internal class PathFinder
@@ -66,7 +97,7 @@ internal class PathFinder
          return overflow;
       }
       List<Point> path = FindPath();
-      return path.Count > 0 ? path[0] - startNode.Location : new Point(0,0);
+      return path.Count > 0 ? path[0] - startNode.Location : new Point(0, 0);
    }
 
    public PathFinder(Map map, Point start, Point end)
@@ -90,7 +121,7 @@ internal class PathFinder
       int x, y;
       x = end.X - deltaX;
       y = end.Y - deltaY;
-      overflow = x < 0 ? new Point(-1, 0) : (x >= mapSize ? new Point(1, 0) : (y < 0 ? new Point(0, -1) : (y >= mapSize ? new Point(0, 1) : null ))); 
+      overflow = x < 0 ? new Point(-1, 0) : (x >= mapSize ? new Point(1, 0) : (y < 0 ? new Point(0, -1) : (y >= mapSize ? new Point(0, 1) : null)));
       if (overflow == null)
       {
          endNode = nodes[end.X - deltaX, end.Y - deltaY];
@@ -138,25 +169,25 @@ internal class PathFinder
    {
       List<Node> walkableNodes = new List<Node>();
       IEnumerable<Point> nextLocations = GetAdjacentLocations(fromNode.Location);
- 
+
       foreach (var location in nextLocations)
       {
          int x = location.X;
          int y = location.Y;
- 
+
          // Stay within the grid's boundaries
          if (x < 0 || x >= nodes.GetLength(0) || y < 0 || y >= nodes.GetLength(1))
             continue;
- 
+
          Node node = this.nodes[x, y];
          // Ignore non-walkable nodes
-         if (!node.IsWalkable)
+         if (!node.IsWalkable && node != endNode)
             continue;
- 
+
          // Ignore already-closed nodes
          if (node.State == NodeState.Closed)
             continue;
- 
+
          // Already-open nodes are only added to the list if their G-value is lower going via this route.
          if (node.State == NodeState.Open)
          {
@@ -175,7 +206,7 @@ internal class PathFinder
             walkableNodes.Add(node);
          }
       }
- 
+
       return walkableNodes;
    }
 
@@ -213,6 +244,14 @@ internal class PathFinder
          TileValue = tileValue;
       }
    }
- 
+
    public enum NodeState { Untested, Open, Closed }
+}
+
+class InterestingObject
+{
+   public int[] distanceFromUser;
+   public TileContent type;
+   public int priority;
+   public Point position;
 }
