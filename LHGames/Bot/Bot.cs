@@ -50,9 +50,9 @@ namespace LHGames.Bot
                 {
                     return AIHelper.CreateUpgradeAction(UpgradeType.CarryingCapacity);
                 }
-                if (PlayerInfo.GetUpgradeLevel(UpgradeType.AttackPower) == 1 && PlayerInfo.TotalResources >= upgrades[1])
+                if (PlayerInfo.GetUpgradeLevel(UpgradeType.CollectingSpeed) == 0 && PlayerInfo.TotalResources >= upgrades[0])
                 {
-                    return AIHelper.CreateUpgradeAction(UpgradeType.AttackPower);
+                    return AIHelper.CreateUpgradeAction(UpgradeType.CollectingSpeed);
                 }
             }
 
