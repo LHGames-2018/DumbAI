@@ -75,7 +75,7 @@ namespace LHGames.Bot
                     return AIHelper.CreatePurchaseAction(PurchasableItem.Backpack);
                 }
             }
-            else if (PlayerInfo.CarriedResources == PlayerInfo.CarryingCapacity)
+            else if (PlayerInfo.CarriedResources == PlayerInfo.CarryingCapacity || objects.Count == 0)
             {
                 nextMove = new PathFinder(map, PlayerInfo.Position, PlayerInfo.HouseLocation).FindNextMove();
             }
@@ -132,7 +132,7 @@ namespace LHGames.Bot
                   if (currentTile.Position == PlayerInfo.HouseLocation)
                   {
                      currentObject = new InterestingObject() { distanceFromUser = new int[2] {currentTile.Position.X, currentTile.Position.Y}, position = currentTile.Position };
-                     currentObject.priority = Math.Abs(currentObject.distanceFromUser[0]) + Math.Abs(currentObject.distanceFromUser[1]) + 2; // -2 pas très important
+                     currentObject.priority = Math.Abs(currentObject.distanceFromUser[0]) + Math.Abs(currentObject.distanceFromUser[1]) + 1; // -2 pas très important
                   }
                   break;
                default:
