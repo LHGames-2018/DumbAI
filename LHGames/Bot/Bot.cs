@@ -52,19 +52,9 @@ namespace LHGames.Bot
             StorageHelper.Write("pointToGo", pointToGo);
             Point deplacement = pointToGo - PlayerInfo.Position;
             Point mouvement;
+            bool maxX = deplacement.X >= deplacement.Y;
 
-            if (Math.Abs(deplacement.X) <= 1 && (PlayerInfo.HouseLocation != pointToGo || deplacement.X == 0))
-            {
-                if(Math.Abs(deplacement.Y) != 1 && pointToGo != PlayerInfo.HouseLocation)
-                {
-                    mouvement = new Point(0, deplacement.Y / Math.Abs(deplacement.Y));
-                }
-                else
-                {
-                    return AIHelper.CreateCollectAction(deplacement);
-                }
-            }
-            else
+            if (maxX)
             {
                 if(Math.Abs(deplacement.X) > 1)
                 {
@@ -72,7 +62,32 @@ namespace LHGames.Bot
                 }
                 else
                 {
-                    return AIHelper.CreateCollectAction(deplacement);
+                    if(PlayerInfo.HouseLocation == pointToGo)
+                    {
+                        mouvement = new Point(deplacement.X / Math.Abs(deplacement.X));
+                    }
+                    else
+                    {
+                        return AIHelper.CreateCollectAction(deplacement);
+                    }
+                }
+            }
+            else
+            {
+                if (Math.Abs(deplacement.Y) > 1)
+                {
+                    mouvement = new Point(0, deplacement.Y / Math.Abs(deplacement.Y));
+                }
+                else
+                {
+                    if (PlayerInfo.HouseLocation == pointToGo)
+                    {
+                        mouvement = new Point(0, deplacement.Y / Math.Abs(deplacement.Y));
+                    }
+                    else
+                    {
+                        return AIHelper.CreateCollectAction(deplacement);
+                    }
                 }
             }
 
