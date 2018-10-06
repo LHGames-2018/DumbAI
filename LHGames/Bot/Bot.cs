@@ -34,10 +34,10 @@ namespace LHGames.Bot
             {
                 PointToGo = PlayerInfo.HouseLocation;
             }
-            else if (PlayerInfo.TotalResources >= 10000 && PlayerInfo.Position == PlayerInfo.HouseLocation)
-            {
-                return AIHelper.CreateUpgradeAction(UpgradeType.CollectingSpeed);
-            }
+            //else if (PlayerInfo.TotalResources >= 10000 && PlayerInfo.Position == PlayerInfo.HouseLocation)
+            //{
+            //    return AIHelper.CreateUpgradeAction(UpgradeType.CollectingSpeed);
+            //}
             else if (PointToGo == null || map.GetTileAt(PointToGo.X, PointToGo.Y) != TileContent.Resource)
             {
                 Point closerRessource = null;
