@@ -56,7 +56,7 @@ namespace LHGames.Bot
 
             if (maxX)
             {
-                if(Math.Abs(deplacement.X) > 1)
+                if(Math.Abs(deplacement.X) > 1 || deplacement.X == deplacement.Y)
                 {
                     mouvement = new Point(deplacement.X / Math.Abs(deplacement.X), 0);
                 }
