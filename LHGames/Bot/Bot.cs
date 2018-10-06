@@ -38,7 +38,7 @@ namespace LHGames.Bot
             {
                 pointToGo = StorageHelper.Read<Point>("pointToGo");
             }
-            if (pointToGo != null || map.GetTileAt(pointToGo.X, pointToGo.Y) != TileContent.Resource)
+            if (pointToGo != null && map.GetTileAt(pointToGo.X, pointToGo.Y) != TileContent.Resource)
             {
                 foreach (Tile tile in map.GetVisibleTiles())
                 {
