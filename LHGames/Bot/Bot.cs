@@ -11,6 +11,7 @@ namespace LHGames.Bot
         private int _currentDirection = 1;
         List<InterestingObject> objects = new List<InterestingObject>();
         //InterestingObject currentObject = null;
+        private int[] upgrades = new int[] { 10000, 15000, 25000, 50000, 100000 };
 
         internal Bot() { }
 
@@ -34,15 +35,27 @@ namespace LHGames.Bot
             getInterestingObjects(map, PlayerInfo.Position);
             objects.Sort((x, y) => x.priority.CompareTo(y.priority));
             PathFinder pathfinder;
-            if (PlayerInfo.CarriedResources == PlayerInfo.CarryingCapacity)
+            Point nextMove;
+            if (PlayerInfo.Position == PlayerInfo.HouseLocation)
             {
-                pathfinder = new PathFinder(map, PlayerInfo.Position, PlayerInfo.HouseLocation);
+                nextMove = new Point();
+                if (PlayerInfo.GetUpgradeLevel(UpgradeType.CarryingCapacity) < 2)
+                {
+                    return AIHelper.CreateUpgradeAction(UpgradeType.CarryingCapacity);
+                }
+                if (PlayerInfo.GetUpgradeLevel(UpgradeType.AttackPower) < 2)
+                {
+                    return AIHelper.CreateUpgradeAction(UpgradeType.AttackPower);
+                }
+            }
+            else if (PlayerInfo.CarriedResources == PlayerInfo.CarryingCapacity)
+            {
+                nextMove = new PathFinder(map, PlayerInfo.Position, PlayerInfo.HouseLocation).FindNextMove();
             }
             else
             {
-                pathfinder = new PathFinder(map, PlayerInfo.Position, objects[0].position);
+                nextMove = new PathFinder(map, PlayerInfo.Position, objects[0].position).FindNextMove();
             }
-            Point nextMove = pathfinder.FindNextMove();
             Point shouldIStayOrShouldIGoNow = PlayerInfo.Position + nextMove;
 
             TileContent content = map.GetTileAt(shouldIStayOrShouldIGoNow.X, shouldIStayOrShouldIGoNow.Y);
