@@ -129,10 +129,10 @@ namespace LHGames.Bot
                   currentObject.priority = Math.Abs(currentObject.distanceFromUser[0]) + Math.Abs(currentObject.distanceFromUser[1]) - 2; //+5 to make the enemies always prioritary over resources
                   break;
                case (int)TileContent.House:
-                  if (currentTile.Position == PlayerInfo.HouseLocation)
+                  if (currentTile.Position == PlayerInfo.HouseLocation && PlayerInfo.CarriedResources != 0)
                   {
-                     currentObject = new InterestingObject() { distanceFromUser = new int[2] {currentTile.Position.X, currentTile.Position.Y}, position = currentTile.Position };
-                     currentObject.priority = Math.Abs(currentObject.distanceFromUser[0]) + Math.Abs(currentObject.distanceFromUser[1]) + 1; // -2 pas très important
+                     currentObject = new InterestingObject() { distanceFromUser = new int[2] {currentTile.Position.X - PlayerInfo.Position.X, currentTile.Position.Y - PlayerInfo.Position.Y}, position = currentTile.Position };
+                     currentObject.priority = Math.Abs(currentObject.distanceFromUser[0]) + Math.Abs(currentObject.distanceFromUser[1]) + 2; // -2 pas très important
                   }
                   break;
                default:
