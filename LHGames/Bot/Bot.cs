@@ -168,12 +168,15 @@ internal class PathFinder
       x = end.X - deltaX;
       y = end.Y - deltaY;
       overflow = x < 0 ? new Point(-1, 0) : (x >= mapSize ? new Point(1, 0) : (y < 0 ? new Point(0, -1) : (y >= mapSize ? new Point(0, 1) : null)));
-      var tileov = map.GetTileAt(start.X + overflow.X, start.Y + overflow.Y);
-      if (tileov == TileContent.Resource || tileov == TileContent.Lava || tileov == TileContent.Shop)
+      if (overflow != null)
       {
-         overflow = new Point(1 - Math.Abs(overflow.X), 1 - Math.Abs(overflow.Y));
+         var tileov = map.GetTileAt(start.X + overflow.X, start.Y + overflow.Y);
+         if (tileov == TileContent.Resource || tileov == TileContent.Lava || tileov == TileContent.Shop)
+         {
+            overflow = new Point(1 - Math.Abs(overflow.X), 1 - Math.Abs(overflow.Y));
+         }
       }
-      if (overflow == null)
+      else
       {
          endNode = nodes[end.X - deltaX, end.Y - deltaY];
       }
