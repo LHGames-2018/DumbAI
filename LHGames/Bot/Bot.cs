@@ -38,7 +38,7 @@ namespace LHGames.Bot
             {
                 pointToGo = StorageHelper.Read<Point>("pointToGo");
             }
-            if (pointToGo != null && map.GetTileAt(pointToGo.X, pointToGo.Y) != TileContent.Resource)
+            if (pointToGo == null || map.GetTileAt(pointToGo.X, pointToGo.Y) != TileContent.Resource)
             {
                 foreach (Tile tile in map.GetVisibleTiles())
                 {
@@ -52,9 +52,10 @@ namespace LHGames.Bot
             StorageHelper.Write("pointToGo", pointToGo);
             Point deplacement = pointToGo - PlayerInfo.Position;
             Point mouvement;
+
             if (Math.Abs(deplacement.X) <= 1 && (PlayerInfo.HouseLocation != pointToGo || deplacement.X == 0))
             {
-                if(Math.Abs(deplacement.Y) == 1 && pointToGo != PlayerInfo.HouseLocation)
+                if(Math.Abs(deplacement.Y) != 1 && pointToGo != PlayerInfo.HouseLocation)
                 {
                     mouvement = new Point(0, deplacement.Y / Math.Abs(deplacement.Y));
                 }
@@ -65,7 +66,14 @@ namespace LHGames.Bot
             }
             else
             {
-                mouvement = new Point(deplacement.X / Math.Abs(deplacement.X), 0);
+                if(Math.Abs(deplacement.X) > 1)
+                {
+                    mouvement = new Point(deplacement.X / Math.Abs(deplacement.X), 0);
+                }
+                else
+                {
+                    return AIHelper.CreateCollectAction(deplacement);
+                }
             }
 
             var data = StorageHelper.Read<TestClass>("Test");
