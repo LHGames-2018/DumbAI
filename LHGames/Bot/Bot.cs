@@ -23,28 +23,28 @@ namespace LHGames.Bot
          PlayerInfo = playerInfo;
       }
 
-        /// <summary>
-        /// Implement your bot here.
-        /// </summary>
-        /// <param name="map">The gamemap.</param>
-        /// <param name="visiblePlayers">Players that are visible to your bot.</param>
-        /// <returns>The action you wish to execute.</returns>
-        internal string ExecuteTurn(Map map, IEnumerable<IPlayer> visiblePlayers)
-        {
-            getInterestingObjects(map, PlayerInfo.Position);
-            objects.Sort((x, y) => x.priority.CompareTo(y.priority));
-            PathFinder pathfinder;
-            if (PlayerInfo.CarriedResources == PlayerInfo.CarryingCapacity && objects[0].type != TileContent.Player)
-            {
-                pathfinder = new PathFinder(map, PlayerInfo.Position, PlayerInfo.HouseLocation);
-            }
-            else
-            {
-                pathfinder = new PathFinder(map, PlayerInfo.Position, objects[0].position);
-            }
-            Point nextMove = pathfinder.FindNextMove();
-            Point shouldIStayOrShouldIGoNow = PlayerInfo.Position + nextMove;
-
+      /// <summary>
+      /// Implement your bot here.
+      /// </summary>
+      /// <param name="map">The gamemap.</param>
+      /// <param name="visiblePlayers">Players that are visible to your bot.</param>
+      /// <returns>The action you wish to execute.</returns>
+      internal string ExecuteTurn(Map map, IEnumerable<IPlayer> visiblePlayers)
+      {
+         getInterestingObjects(map, PlayerInfo.Position);
+         objects.Sort((x, y) => x.priority.CompareTo(y.priority));
+         PathFinder pathfinder;
+         if (PlayerInfo.CarriedResources == PlayerInfo.CarryingCapacity && objects[0].type != TileContent.Player)
+         {
+            pathfinder = new PathFinder(map, PlayerInfo.Position, PlayerInfo.HouseLocation);
+         }
+         else
+         {
+            pathfinder = new PathFinder(map, PlayerInfo.Position, objects[0].position);
+         }
+         pathfinder = new PathFinder(map, PlayerInfo.Position, new Point(59, 30));
+         Point nextMove = pathfinder.FindNextMove();
+         Point shouldIStayOrShouldIGoNow = PlayerInfo.Position + nextMove;
          TileContent content = map.GetTileAt(shouldIStayOrShouldIGoNow.X, shouldIStayOrShouldIGoNow.Y);
          switch (content)
          {
@@ -146,7 +146,7 @@ internal class PathFinder
       int x, y;
       x = end.X - deltaX;
       y = end.Y - deltaY;
-      overflow = x < 0 ? new Point(1, 0) : (x >= mapSize ? new Point(-1, 0) : (y < 0 ? new Point(0, 1) : (y >= mapSize ? new Point(0, -1) : null)));
+      overflow = x < 0 ? new Point(-1, 0) : (x >= mapSize ? new Point(1, 0) : (y < 0 ? new Point(0, -1) : (y >= mapSize ? new Point(0, 1) : null)));
       if (overflow == null)
       {
          endNode = nodes[end.X - deltaX, end.Y - deltaY];
