@@ -138,7 +138,7 @@ internal class PathFinder
                 TileContent tile = map.GetTileAt(i + deltaX, j + deltaY);
                 nodes[i, j] = new Node(tile == TileContent.Empty || tile == TileContent.Wall || tile == TileContent.House,
                    new Point(i, j),
-                   Math.Abs(i + deltaX - end.X) + Math.Abs(j + deltaY - end.Y), tile == TileContent.Wall ? 4 : 1);
+                   Math.Abs(i + deltaX - end.X) + Math.Abs(j + deltaY - end.Y), tile == TileContent.Wall ? 1 : 1);
             }
         }
 
