@@ -146,7 +146,7 @@ internal class PathFinder
         int x, y;
         x = end.X - deltaX;
         y = end.Y - deltaY;
-        overflow = x < 0 ? new Point(-1, 0) : (x > mapSize ? new Point(1, 0) : (y < 0 ? new Point(0, -1) : (y > mapSize ? new Point(0, 1) : null)));
+        overflow = x < 0 ? new Point(-1, 0) : (x >= mapSize ? new Point(1, 0) : (y < 0 ? new Point(0, -1) : (y >= mapSize ? new Point(0, 1) : null)));
         if (overflow == null)
         {
             endNode = nodes[end.X - deltaX, end.Y - deltaY];
