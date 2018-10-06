@@ -34,7 +34,7 @@ namespace LHGames.Bot
             getInterestingObjects(map, PlayerInfo.Position);
             objects.Sort((x, y) => x.priority.CompareTo(y.priority));
             PathFinder pathfinder;
-            if (PlayerInfo.CarriedResources == PlayerInfo.CarryingCapacity)
+            if (PlayerInfo.CarriedResources == PlayerInfo.CarryingCapacity && objects[0].type != TileContent.Player)
             {
                 pathfinder = new PathFinder(map, PlayerInfo.Position, PlayerInfo.HouseLocation);
             }
