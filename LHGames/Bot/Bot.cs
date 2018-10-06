@@ -5,13 +5,13 @@ using LHGames.Helper;
 
 namespace LHGames.Bot
 {
-    internal class Bot
-    {
-        internal IPlayer PlayerInfo { get; set; }
-        private int _currentDirection = 1;
-        List<InterestingObject> objects = new List<InterestingObject>();
-        //InterestingObject currentObject = null;
-        private int[] upgrades = new int[] { 10000, 15000, 25000, 50000, 100000 };
+   internal class Bot
+   {
+      internal IPlayer PlayerInfo { get; set; }
+      private int _currentDirection = 1;
+      List<InterestingObject> objects = new List<InterestingObject>();
+      //InterestingObject currentObject = null;
+      private int[] upgrades = new int[] { 10000, 15000, 25000, 50000, 100000 };
 
       internal Bot() { }
 
@@ -24,64 +24,66 @@ namespace LHGames.Bot
          PlayerInfo = playerInfo;
       }
 
-        /// <summary>
-        /// Implement your bot here.
-        /// </summary>
-        /// <param name="map">The gamemap.</param>
-        /// <param name="visiblePlayers">Players that are visible to your bot.</param>
-        /// <returns>The action you wish to execute.</returns>
-        internal string ExecuteTurn(Map map, IEnumerable<IPlayer> visiblePlayers)
-        {
-            getInterestingObjects(map, PlayerInfo.Position);
-            objects.Sort((x, y) => x.priority.CompareTo(y.priority));
-            Point nextMove;
-            if (PlayerInfo.Position == PlayerInfo.HouseLocation)
+      /// <summary>
+      /// Implement your bot here.
+      /// </summary>
+      /// <param name="map">The gamemap.</param>
+      /// <param name="visiblePlayers">Players that are visible to your bot.</param>
+      /// <returns>The action you wish to execute.</returns>
+      internal string ExecuteTurn(Map map, IEnumerable<IPlayer> visiblePlayers)
+      {
+         getInterestingObjects(map, PlayerInfo.Position);
+         objects.Sort((x, y) => x.priority.CompareTo(y.priority));
+         Point nextMove;
+         if (PlayerInfo.Position == PlayerInfo.HouseLocation)
+         {
+            nextMove = new Point();
+            if (PlayerInfo.GetUpgradeLevel(UpgradeType.CarryingCapacity) == 0 && PlayerInfo.TotalResources >= upgrades[0])
             {
-                nextMove = new Point();
-                if (PlayerInfo.GetUpgradeLevel(UpgradeType.CarryingCapacity) == 0 && PlayerInfo.TotalResources >= upgrades[0])
-                {
-                    return AIHelper.CreateUpgradeAction(UpgradeType.CarryingCapacity);
-                }
-                if (PlayerInfo.GetUpgradeLevel(UpgradeType.AttackPower) == 0 && PlayerInfo.TotalResources >= upgrades[0])
-                {
-                    return AIHelper.CreateUpgradeAction(UpgradeType.AttackPower);
-                }
-                if (PlayerInfo.GetUpgradeLevel(UpgradeType.CarryingCapacity) == 1 && PlayerInfo.TotalResources >= upgrades[1])
-                {
-                    return AIHelper.CreateUpgradeAction(UpgradeType.CarryingCapacity);
-                }
-                if (PlayerInfo.GetUpgradeLevel(UpgradeType.AttackPower) == 1 && PlayerInfo.TotalResources >= upgrades[1])
-                {
-                    return AIHelper.CreateUpgradeAction(UpgradeType.AttackPower);
-                }
+               return AIHelper.CreateUpgradeAction(UpgradeType.CarryingCapacity);
             }
+            if (PlayerInfo.GetUpgradeLevel(UpgradeType.AttackPower) == 0 && PlayerInfo.TotalResources >= upgrades[0])
+            {
+               return AIHelper.CreateUpgradeAction(UpgradeType.AttackPower);
+            }
+            if (PlayerInfo.GetUpgradeLevel(UpgradeType.CarryingCapacity) == 1 && PlayerInfo.TotalResources >= upgrades[1])
+            {
+               return AIHelper.CreateUpgradeAction(UpgradeType.CarryingCapacity);
+            }
+            if (PlayerInfo.GetUpgradeLevel(UpgradeType.AttackPower) == 1 && PlayerInfo.TotalResources >= upgrades[1])
+            {
+               return AIHelper.CreateUpgradeAction(UpgradeType.AttackPower);
+            }
+         }
 
-            if (PlayerInfo.CarriedResources == PlayerInfo.CarryingCapacity)
-            {
-                nextMove = new PathFinder(map, PlayerInfo.Position, PlayerInfo.HouseLocation).FindNextMove();
-            }
-            else
-            {
-                nextMove = new PathFinder(map, PlayerInfo.Position, objects[0].position).FindNextMove();
-            }
-            Point shouldIStayOrShouldIGoNow = PlayerInfo.Position + nextMove;
+         if (PlayerInfo.CarriedResources == PlayerInfo.CarryingCapacity)
+         {
+            nextMove = new PathFinder(map, PlayerInfo.Position, PlayerInfo.HouseLocation).FindNextMove();
+         }
+         else
+         {
+            nextMove = new PathFinder(map, PlayerInfo.Position, objects[0].position).FindNextMove();
+         }
+         Point shouldIStayOrShouldIGoNow = PlayerInfo.Position + nextMove;
 
-            TileContent content = map.GetTileAt(shouldIStayOrShouldIGoNow.X, shouldIStayOrShouldIGoNow.Y);
-            switch (content)
-            {
-                case TileContent.Empty:
-                case TileContent.House:
-                    return AIHelper.CreateMoveAction(nextMove);
-                case TileContent.Resource:
-                    return AIHelper.CreateCollectAction(nextMove);
-                case TileContent.Wall:
-                    return AIHelper.CreateMeleeAttackAction(nextMove);
-                case TileContent.Player:
-                    return AIHelper.CreateMeleeAttackAction(nextMove);
-                default:
-                    return AIHelper.CreateEmptyAction();
-            }
-        }
+         TileContent content = map.GetTileAt(shouldIStayOrShouldIGoNow.X, shouldIStayOrShouldIGoNow.Y);
+         switch (content)
+         {
+            case TileContent.Empty:
+            case TileContent.House:
+               return AIHelper.CreateMoveAction(nextMove);
+            case TileContent.Resource:
+               if (PlayerInfo.CarriedResources == PlayerInfo.CarryingCapacity)
+                  return AIHelper.CreateMoveAction(new Point(-nextMove.X, -nextMove.Y));
+                  return AIHelper.CreateCollectAction(nextMove);
+            case TileContent.Wall:
+               return AIHelper.CreateMeleeAttackAction(nextMove);
+            case TileContent.Player:
+               return AIHelper.CreateMeleeAttackAction(nextMove);
+            default:
+               return AIHelper.CreateEmptyAction();
+         }
+      }
 
       /// <summary>
       /// Gets called after ExecuteTurn.
