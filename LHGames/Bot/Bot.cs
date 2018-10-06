@@ -7,9 +7,10 @@ namespace LHGames.Bot
     internal class Bot
     {
         internal IPlayer PlayerInfo { get; set; }
-        private int _currentDirection = 1;
 
         internal Bot() { }
+
+        Point PointToGo { get; set; }
 
         /// <summary>
         /// Gets called before ExecuteTurn. This is where you get your bot's state.
@@ -29,40 +30,47 @@ namespace LHGames.Bot
         /// <returns>The action you wish to execute.</returns>
         internal string ExecuteTurn(Map map, IEnumerable<IPlayer> visiblePlayers)
         {
-            Point pointToGo;
-            if (PlayerInfo.CarriedResources == PlayerInfo.CarryingCapacity)
+            if (PlayerInfo.CarriedResources >= 500)
             {
-                pointToGo = PlayerInfo.HouseLocation;
+                PointToGo = PlayerInfo.HouseLocation;
             }
-            else
+            else if (PointToGo == null || map.GetTileAt(PointToGo.X, PointToGo.Y) != TileContent.Resource)
             {
-                pointToGo = StorageHelper.Read<Point>("pointToGo");
-            }
-            if (pointToGo == null || map.GetTileAt(pointToGo.X, pointToGo.Y) != TileContent.Resource)
-            {
+                Point closerRessource = null;
                 foreach (Tile tile in map.GetVisibleTiles())
                 {
                     if (tile.TileType == TileContent.Resource)
                     {
-                        pointToGo = tile.Position;
-                        break;
+                        if (closerRessource == null)
+                        {
+                            closerRessource = tile.Position;
+                        }
+                        else
+                        {
+                            if (Point.DistanceSquared(closerRessource, PlayerInfo.Position) > Point.DistanceSquared(tile.Position, PlayerInfo.Position))
+                            {
+                                closerRessource = tile.Position;
+                            }
+                        }
                     }
                 }
+                PointToGo = closerRessource;
             }
-            StorageHelper.Write("pointToGo", pointToGo);
-            Point deplacement = pointToGo - PlayerInfo.Position;
+
+            StorageHelper.Write("PointToGo", PointToGo);
+            Point deplacement = PointToGo - PlayerInfo.Position;
             Point mouvement;
-            bool maxX = deplacement.X >= deplacement.Y;
+            bool maxX = Math.Abs(deplacement.X) >= Math.Abs(deplacement.Y);
 
             if (maxX)
             {
-                if(Math.Abs(deplacement.X) > 1 || deplacement.X == deplacement.Y)
+                if (Math.Abs(deplacement.X) > 1 || deplacement.X == deplacement.Y)
                 {
                     mouvement = new Point(deplacement.X / Math.Abs(deplacement.X), 0);
                 }
                 else
                 {
-                    if(PlayerInfo.HouseLocation == pointToGo)
+                    if (PlayerInfo.HouseLocation == PointToGo)
                     {
                         mouvement = new Point(deplacement.X / Math.Abs(deplacement.X));
                     }
@@ -80,7 +88,7 @@ namespace LHGames.Bot
                 }
                 else
                 {
-                    if (PlayerInfo.HouseLocation == pointToGo)
+                    if (PlayerInfo.HouseLocation == PointToGo)
                     {
                         mouvement = new Point(0, deplacement.Y / Math.Abs(deplacement.Y));
                     }
@@ -91,7 +99,7 @@ namespace LHGames.Bot
                 }
             }
 
-            var data = StorageHelper.Read<TestClass>("Test");
+            TestClass data = StorageHelper.Read<TestClass>("Test");
             Console.WriteLine(data?.Test);
             return AIHelper.CreateMoveAction(mouvement);
         }
