@@ -56,7 +56,7 @@ namespace LHGames.Bot
                 }
             }
 
-            if (PlayerInfo.TotalResources >= 0 && !PlayerInfo.CarriedItems.Contains(PurchasableItem.Backpack))
+            if (PlayerInfo.TotalResources >= 30000 && !PlayerInfo.CarriedItems.Contains(PurchasableItem.Backpack))
             {
                 Point shopLocation = map.GetVisibleTiles().FirstOrDefault(x => x.TileType == TileContent.Shop)?.Position;
 
@@ -124,13 +124,19 @@ namespace LHGames.Bot
                         currentObject.priority = Math.Abs(currentObject.distanceFromUser[0]) + Math.Abs(currentObject.distanceFromUser[1]);
                         break;
 
-                    case 6:
-                        currentObject = new InterestingObject() { distanceFromUser = new int[2] { currentTile.Position.X - PlayerInfo.Position.X, currentTile.Position.Y - PlayerInfo.Position.Y }, type = currentTile.TileType, position = currentTile.Position };
-                        currentObject.priority = Math.Abs(currentObject.distanceFromUser[0]) + Math.Abs(currentObject.distanceFromUser[1]) - 2; //+5 to make the enemies always prioritary over resources
-                        break;
-
-                    default:
-                        break;
+               case 6:
+                  currentObject = new InterestingObject() { distanceFromUser = new int[2] { currentTile.Position.X - PlayerInfo.Position.X, currentTile.Position.Y - PlayerInfo.Position.Y }, type = currentTile.TileType, position = currentTile.Position };
+                  currentObject.priority = Math.Abs(currentObject.distanceFromUser[0]) + Math.Abs(currentObject.distanceFromUser[1]) - 2; //+5 to make the enemies always prioritary over resources
+                  break;
+               case (int)TileContent.House:
+                  if (currentTile.Position == PlayerInfo.HouseLocation)
+                  {
+                     currentObject = new InterestingObject() { distanceFromUser = new int[2] {currentTile.Position.X, currentTile.Position.Y}, position = currentTile.Position };
+                     currentObject.priority = Math.Abs(currentObject.distanceFromUser[0]) + Math.Abs(currentObject.distanceFromUser[1]) + 2; // -2 pas très important
+                  }
+                  break;
+               default:
+                  break;
 
                 }
                 if (currentObject != null && currentObject.position != ownPosition)
