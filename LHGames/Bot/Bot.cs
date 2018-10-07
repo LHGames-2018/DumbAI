@@ -78,11 +78,7 @@ namespace LHGames.Bot
             {
                return AIHelper.CreatePurchaseAction(PurchasableItem.Backpack);
             }
-         } else if (true)
-         {
-            nextMove = new Point(-1, 0);
-         }
-         else if (PlayerInfo.CarriedResources == PlayerInfo.CarryingCapacity || objects.Count == 0)
+         } else if (PlayerInfo.CarriedResources == PlayerInfo.CarryingCapacity || objects.Count == 0)
          {
             nextMove = new PathFinder(map, PlayerInfo.Position, PlayerInfo.HouseLocation).FindNextMove();
          }
